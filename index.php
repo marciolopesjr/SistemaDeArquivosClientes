@@ -187,7 +187,7 @@ include 'auth.php';
         var deleteButton = document.getElementById('deleteButton');
         var shareButton = document.getElementById('shareButton');
         if (filePath.endsWith('.mp4') || filePath.endsWith('.avi')) {
-            modalBody.innerHTML = `<video width='100%' controls><source src='${filePath}' type='video/mp4'>Seu navegador não suporta a tag de vídeo.</video>`;
+            modalBody.innerHTML = `<video id="modalVideo" width='100%' controls><source src='${filePath}' type='video/mp4'>Seu navegador não suporta a tag de vídeo.</video>`;
         } else {
             modalBody.innerHTML = `<img src='${filePath}' alt='Arquivo' class='img-fluid'>`;
         }
@@ -195,7 +195,15 @@ include 'auth.php';
         deleteButton.onclick = function() { deleteFile(filePath); };
         shareButton.onclick = function() { shareFile(filePath); };
     });
-    
+
+    // Adicionar evento para pausar o vídeo quando o modal for fechado
+    fileModal.addEventListener('hide.bs.modal', function () {
+        var modalVideo = document.getElementById('modalVideo');
+        if (modalVideo) {
+            modalVideo.pause();
+        }
+    });
+
     function deleteFile(path) {
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
         deleteModal.show();
