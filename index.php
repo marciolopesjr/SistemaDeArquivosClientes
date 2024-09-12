@@ -147,16 +147,26 @@ include 'auth.php';
         
         function deleteFile(path) {
             if (confirm('Você tem certeza que deseja excluir este arquivo?')) {
-                // Implementar a lógica de exclusão aqui
-                alert('Arquivo excluído: ' + path);
-                location.reload(); // Recarregar a página após exclusão
+                window.location.href = 'upload.php?delete=' + encodeURIComponent(path);
             }
         }
         
         function shareFile(path) {
-            navigator.clipboard.writeText(window.location.href.replace('index.php', '') + path).then(function() {
-                alert('Link copiado para a área de transferência');
-            });
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Compartilhamento de Arquivo',
+                    text: 'Confira este arquivo:',
+                    url: window.location.href.replace('index.php', '') + path
+                }).then(() => {
+                    console.log('Arquivo compartilhado com sucesso!');
+                }).catch((error) => {
+                    console.error('Erro ao compartilhar o arquivo:', error);
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href.replace('index.php', '') + path).then(function() {
+                    alert('Link copiado para a área de transferência');
+                });
+            }
         }
     </script>
 </body>

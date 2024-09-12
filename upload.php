@@ -76,5 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['delete'])) {
     $filePath = $_GET['delete'];
     deleteFile($filePath);
+    header("Location: index.php");
+    exit;
 }
 ?>
