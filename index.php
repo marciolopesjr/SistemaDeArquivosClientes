@@ -28,14 +28,10 @@ include 'auth.php';
     <div class="container">
         <h2 class="mt-5">Galeria de Arquivos</h2>
         
-        <!-- Formulário de Upload -->
-        <form action="upload.php" method="post" enctype="multipart/form-data" class="mb-5">
-            <div class="mb-3">
-                <label for="file" class="form-label">Escolha um arquivo:</label>
-                <input type="file" class="form-control" name="file" id="file" required>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload</button>
-        </form>
+        <!-- Botão para abrir o modal de upload -->
+        <button type="button" class="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="fas fa-upload"></i> Upload de Arquivo
+        </button>
         
         <h3>Imagens</h3>
         <div class="row">
@@ -117,10 +113,42 @@ include 'auth.php';
         </div>
     </div>
     
+    <!-- Modal para Upload de Arquivo -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload de Arquivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="uploadForm" action="upload.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Escolha um arquivo:</label>
+                            <input type="file" class="form-control" name="file" id="fileInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fileName" class="form-label">Nome do Arquivo:</label>
+                            <input type="text" class="form-control" name="filename" id="fileName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fileDescription" class="form-label">Descrição:</label>
+                            <textarea class="form-control" name="filedescription" id="fileDescription" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-    <!-- Script para manipular o modal e botões -->
+    <!-- Script para manipular os modais e botões -->
     <script>
         var filePath = '';
         
@@ -146,9 +174,12 @@ include 'auth.php';
         });
         
         function deleteFile(path) {
-            if (confirm('Você tem certeza que deseja excluir este arquivo?')) {
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+            
+            document.getElementById('confirmDeleteButton').onclick = function() {
                 window.location.href = 'upload.php?delete=' + encodeURIComponent(path);
-            }
+            };
         }
         
         function shareFile(path) {
@@ -163,10 +194,58 @@ include 'auth.php';
                     console.error('Erro ao compartilhar o arquivo:', error);
                 });
             } else {
-                navigator.clipboard.writeText(window.location.href.replace('index.php', '') + path).then(function() {
-                    alert('Link copiado para a área de transferência');
-                });
+                var shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+                shareModal.show();
+                document.getElementById('shareLink').value = window.location.href.replace('index.php', '') + path;
             }
+        }
+    </script>
+    
+    <!-- Modal de Confirmação de Exclusão -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Você tem certeza que deseja excluir este arquivo?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Compartilhamento -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Compartilhar Link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="shareLink" readonly>
+                        <button class="btn btn-primary" onclick="copyToClipboard()"><i class="fas fa-copy"></i> Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            var shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            
+            var tooltip = new bootstrap.Tooltip(document.querySelector('.btn'));
+            tooltip.show();
         }
     </script>
 </body>
