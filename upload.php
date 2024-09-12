@@ -49,12 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $uploadOk = 0;
     }
 
-    // Verifica o tamanho do arquivo (opcional)
-    if ($_FILES["file"]["size"] > 5000000) { // 5MB
-        echo "Desculpe, o arquivo é muito grande.";
-        $uploadOk = 0;
-    }
-
     // Permitir certos formatos de arquivo
     if($fileType != "jpg" && $fileType != "png" && $fileType != "jpeg" 
     && $fileType != "gif" && $fileType != "mp4" && $fileType != "avi") {
