@@ -25,9 +25,6 @@ include 'auth.php';
         .video-control {
             pointer-events: none;
         }
-        .progress {
-            height: 20px;
-        }
     </style>
 </head>
 <body>
@@ -60,31 +57,76 @@ include 'auth.php';
         <div class="mb-4">
             <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar arquivos..." onkeyup="filterFiles()">
         </div>
-        <div class="d-flex mb-5">
-            <!-- Botão para abrir o modal de upload -->
-            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <i class="fas fa-upload"></i> Upload de Arquivo
-            </button>
-            <!-- Botão para abrir o modal de upload múltiplo -->
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#multiUploadModal">
-                <i class="fas fa-upload"></i> Upload Múltiplo
-            </button>
-        </div>
-        
+        <!-- Botão para abrir o modal de upload -->
+        <button type="button" class="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="fas fa-upload"></i> Upload de Arquivo
+        </button>
         <h3>Imagens</h3>
         <div class="row" id="imageGallery">
-            <!-- Código PHP para listar imagens -->
+            <?php
+            $imageDir = 'uploads/images/';
+            if (is_dir($imageDir)) {
+                if ($dh = opendir($imageDir)) {
+                    while (($file = readdir($dh)) !== false) {
+                        if ($file != '.' && $file != '..') {
+                            echo "<div class='col-12 col-md-4 file-item'>
+                                <div class='card'>
+                                    <img src='$imageDir$file' class='card-img-top' alt='$file' data-bs-toggle='modal' data-bs-target='#fileModal' data-filepath='$imageDir$file'>
+                                    <div class='card-body'>
+                                        <p class='card-text'>$file</p>
+                                    </div>
+                                </div>
+                            </div>";
+                        }
+                    }
+                    closedir($dh);
+                }
+            }
+            ?>
         </div>
         <h3>Vídeos</h3>
         <div class="row" id="videoGallery">
-            <!-- Código PHP para listar vídeos -->
+            <?php
+            $videoDir = 'uploads/videos/';
+            if (is_dir($videoDir)) {
+                if ($dh = opendir($videoDir)) {
+                    while (($file = readdir($dh)) !== false) {
+                        if ($file != '.' && $file != '..') {
+                            $fileType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                            echo "<div class='col-12 col-md-6 file-item'>
+                                <div class='card'>
+                                    <div class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal'>
+                                        <video class='video-control'><source src='$videoDir$file' type='video/$fileType'></video>
+                                    </div>
+                                    <div class='card-body'>
+                                        <p class='card-text'>$file</p>
+                                    </div>
+                                </div>
+                            </div>";
+                        }
+                    }
+                    closedir($dh);
+                }
+            }
+            ?>
         </div>
         <h3>Outros Arquivos</h3>
         <ul class="list-group" id="otherFiles">
-            <!-- Código PHP para listar outros arquivos -->
+            <?php
+            $otherDir = 'uploads/others/';
+            if (is_dir($otherDir)) {
+                if ($dh = opendir($otherDir)) {
+                    while (($file = readdir($dh)) !== false) {
+                        if ($file != '.' && $file != '..') {
+                            echo "<li class='list-group-item'><a href='$otherDir$file' target='_blank'><i class='fas fa-file-alt'></i> $file</a></li>";
+                        }
+                    }
+                    closedir($dh);
+                }
+            }
+            ?>
         </ul>
     </div>
-
     <!-- Modal para Preview de Arquivo -->
     <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -104,7 +146,6 @@ include 'auth.php';
             </div>
         </div>
     </div>
-
     <!-- Modal para Upload de Arquivo -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -131,38 +172,6 @@ include 'auth.php';
             </div>
         </div>
     </div>
-
-    <!-- Modal para Upload Múltiplo -->
-    <div class="modal fade" id="multiUploadModal" tabindex="-1" aria-labelledby="multiUploadModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="multiUploadModalLabel">Upload Múltiplo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="multiUploadForm" action="multi_upload.php" method="post" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="multiFileInput" class="form-label">Escolha os arquivos:</label>
-                            <input type="file" class="form-control" name="files[]" id="multiFileInput" required multiple onchange="previewMultipleFiles()">
-                        </div>
-                        <!-- Barra de progresso -->
-                        <div class="progress mb-3">
-                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                        </div>
-                        <div id="multiFilePreview" class="text-center">
-                            <!-- Preview dos arquivos será carregado dinamicamente -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
@@ -202,7 +211,7 @@ include 'auth.php';
             window.location.href = 'upload.php?delete=' + encodeURIComponent(path);
         };
     }
-
+    
     function shareFile(path) {
         if (navigator.share) {
             navigator.share({
@@ -242,31 +251,6 @@ include 'auth.php';
         }
     }
 
-    function previewMultipleFiles() {
-        var files = document.getElementById('multiFileInput').files;
-        var preview = document.getElementById('multiFilePreview');
-        preview.innerHTML = '';
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                var reader = new FileReader();
-                reader.onload = (function(file) {
-                    return function(e) {
-                        var fileType = file.type;
-                        if (fileType.startsWith('image/')) {
-                            preview.innerHTML += `<h5>${file.name}</h5><img src="${e.target.result}" alt="${file.name}" class="img-fluid mb-3">`;
-                        } else if (fileType.startsWith('video/')) {
-                            preview.innerHTML += `<h5>${file.name}</h5><video width="100%" controls class="mb-3"><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
-                        } else {
-                            preview.innerHTML += `<h5>${file.name}</h5><p>Pré-visualização não disponível para este tipo de arquivo.</p>`;
-                        }
-                    };
-                })(file);
-                reader.readAsDataURL(file);
-            }
-        }
-    }
-
     function filterFiles() {
         var searchInput = document.getElementById('searchInput').value.toLowerCase();
         var imageGallery = document.getElementById('imageGallery').getElementsByClassName('file-item');
@@ -298,30 +282,7 @@ include 'auth.php';
             }
         }
     }
-
-    document.getElementById('multiUploadForm').onsubmit = function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', this.action, true);
-        xhr.upload.addEventListener('progress', function(e) {
-            if (e.lengthComputable) {
-                var percentComplete = (e.loaded / e.total) * 100;
-                document.getElementById('progressBar').style.width = percentComplete + '%';
-                document.getElementById('progressBar').innerText = Math.round(percentComplete) + '%';
-            }
-        });
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                window.location.href = 'index.php';
-            } else {
-                alert('Erro ao fazer upload dos arquivos.');
-            }
-        };
-        xhr.send(formData);
-    };
     </script>
-
     <!-- Modal de confirmação de exclusão -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -367,6 +328,5 @@ include 'auth.php';
         tooltip.show();
     }
     </script>
-
 </body>
 </html>
