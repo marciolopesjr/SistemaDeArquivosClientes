@@ -22,30 +22,33 @@ include 'auth.php';
         .modal-body img, .modal-body video {
             width: 100%;
         }
+        video[controls] {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2 class="mt-5 mb-3">Galeria de Arquivos</h2>
-        
+
         <!-- Barra de pesquisa -->
         <div class="mb-4">
             <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar arquivos..." onkeyup="filterFiles()">
         </div>
-        
+
         <!-- Botão para abrir o modal de upload -->
         <button type="button" class="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#uploadModal">
             <i class="fas fa-upload"></i> Upload de Arquivo
         </button>
-        
+
         <h3>Imagens</h3>
         <div class="row" id="imageGallery">
         <?php
-        $imageDir = "uploads/images/";
+        $imageDir = 'uploads/images/';
         if (is_dir($imageDir)) {
             if ($dh = opendir($imageDir)) {
                 while (($file = readdir($dh)) !== false) {
-                    if ($file != "." && $file != "..") {
+                    if ($file != '.' && $file != '..') {
                         echo "<div class='col-12 col-md-4 file-item'>
                                 <div class='card'>
                                     <img src='$imageDir$file' class='card-img-top' alt='$file' data-bs-toggle='modal' data-bs-target='#fileModal' data-filepath='$imageDir$file'>
@@ -61,19 +64,19 @@ include 'auth.php';
         }
         ?>
         </div>
-        
+
         <h3>Vídeos</h3>
         <div class="row" id="videoGallery">
         <?php
-        $videoDir = "uploads/videos/";
+        $videoDir = 'uploads/videos/';
         if (is_dir($videoDir)) {
             if ($dh = opendir($videoDir)) {
                 while (($file = readdir($dh)) !== false) {
-                    if ($file != "." && $file != "..") {
+                    if ($file != '.' && $file != '..') {
                         $fileType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                         echo "<div class='col-12 col-md-6 file-item'>
                                 <div class='card'>
-                                    <video class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal' controls>
+                                    <video class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal'>
                                         <source src='$videoDir$file' type='video/$fileType'>
                                         Seu navegador não suporta a tag de vídeo.
                                     </video>
@@ -89,15 +92,15 @@ include 'auth.php';
         }
         ?>
         </div>
-        
+
         <h3>Outros Arquivos</h3>
         <ul class="list-group" id="otherFiles">
         <?php
-        $otherDir = "uploads/others/";
+        $otherDir = 'uploads/others/';
         if (is_dir($otherDir)) {
             if ($dh = opendir($otherDir)) {
                 while (($file = readdir($dh)) !== false) {
-                    if ($file != "." && $file != "..") {
+                    if ($file != '.' && $file != '..') {
                         echo "<li class='list-group-item'><a href='$otherDir$file' target='_blank'><i class='fas fa-file-alt'></i> $file</a></li>";
                     }
                 }
@@ -107,7 +110,7 @@ include 'auth.php';
         ?>
         </ul>
     </div>
-    
+
     <!-- Modal para Preview de Arquivo -->
     <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -127,7 +130,7 @@ include 'auth.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Modal para Upload de Arquivo -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -154,24 +157,24 @@ include 'auth.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     <!-- Script para manipular os modais, filtros e botões -->
     <script>
         var filePath = '';
-        
+
         var fileModal = document.getElementById('fileModal');
         fileModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             filePath = button.getAttribute('data-filepath');
-            
+
             var modalBody = fileModal.querySelector('.modal-body');
             var downloadLink = document.getElementById('downloadLink');
             var deleteButton = document.getElementById('deleteButton');
             var shareButton = document.getElementById('shareButton');
-            
+
             if (filePath.endsWith('.mp4') || filePath.endsWith('.avi')) {
                 modalBody.innerHTML = `<video width='100%' controls><source src='${filePath}' type='video/mp4'>Seu navegador não suporta a tag de vídeo.</video>`;
             } else {
@@ -182,16 +185,16 @@ include 'auth.php';
             deleteButton.onclick = function() { deleteFile(filePath); };
             shareButton.onclick = function() { shareFile(filePath); };
         });
-        
+
         function deleteFile(path) {
             var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
             deleteModal.show();
-            
+
             document.getElementById('confirmDeleteButton').onclick = function() {
                 window.location.href = 'upload.php?delete=' + encodeURIComponent(path);
             };
         }
-        
+
         function shareFile(path) {
             if (navigator.share) {
                 navigator.share({
@@ -209,26 +212,26 @@ include 'auth.php';
                 document.getElementById('shareLink').value = window.location.href.replace('index.php', '') + path;
             }
         }
-        
+
         function previewFile() {
             var file = document.getElementById('fileInput').files[0];
             var preview = document.getElementById('filePreview');
-            
+
             if (file) {
                 var reader = new FileReader();
-                
+
                 reader.onload = function(e) {
                     var fileType = file.type;
-                    
+
                     if (fileType.startsWith('image/')) {
                         preview.innerHTML = `<h5>${file.name}</h5><img src="${e.target.result}" alt="${file.name}" class="img-fluid">`;
                     } else if (fileType.startsWith('video/')) {
-                        preview.innerHTML = `<h5>${file.name}</h5><video width="100%" controls><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
+                        preview.innerHTML = `<h5>${file.name}</h5><video width="100%"><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
                     } else {
                         preview.innerHTML = `<h5>${file.name}</h5><p>Pré-visualização não disponível para este tipo de arquivo.</p>`;
                     }
                 }
-                
+
                 reader.readAsDataURL(file);
             } else {
                 preview.innerHTML = '';
@@ -268,7 +271,7 @@ include 'auth.php';
             }
         }
     </script>
-    
+
     <!-- Modal de Confirmação de Exclusão -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -287,7 +290,7 @@ include 'auth.php';
             </div>
         </div>
     </div>
-    
+
     <!-- Modal de Compartilhamento -->
     <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -305,13 +308,13 @@ include 'auth.php';
             </div>
         </div>
     </div>
-    
+
     <script>
         function copyToClipboard() {
             var shareLink = document.getElementById('shareLink');
             shareLink.select();
             document.execCommand('copy');
-            
+
             var tooltip = new bootstrap.Tooltip(document.querySelector('.btn'));
             tooltip.show();
         }
