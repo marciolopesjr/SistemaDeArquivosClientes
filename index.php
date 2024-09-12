@@ -155,20 +155,21 @@ include 'auth.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="uploadForm" action="upload.php" method="post" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="fileInput" class="form-label">Escolha um arquivo:</label>
-                            <input type="file" class="form-control" name="file" id="fileInput" required onchange="previewFile()">
-                        </div>
-                        <div id="filePreview" class="text-center">
-                            <!-- Preview do arquivo será carregado dinamicamente -->
-                        </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                    <label for="fileInput" class="form-label">Escolha os arquivos:</label>
+                    <input type="file" class="form-control" name="files[]" id="fileInput" multiple required>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                    <div id="filePreview" class="text-center">
+                    <!-- Previsualização do arquivo será carregada dinamicamente -->
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
                 </form>
+
             </div>
         </div>
     </div>
