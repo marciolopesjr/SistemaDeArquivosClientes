@@ -26,7 +26,12 @@ include 'auth.php';
 </head>
 <body>
     <div class="container">
-        <h2 class="mt-5">Galeria de Arquivos</h2>
+        <h2 class="mt-5 mb-3">Galeria de Arquivos</h2>
+        
+        <!-- Barra de pesquisa -->
+        <div class="mb-4">
+            <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar arquivos..." onkeyup="filterFiles()">
+        </div>
         
         <!-- Botão para abrir o modal de upload -->
         <button type="button" class="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#uploadModal">
@@ -34,7 +39,7 @@ include 'auth.php';
         </button>
         
         <h3>Imagens</h3>
-        <div class="row">
+        <div class="row" id="imageGallery">
         <?php
         $imageDir = "uploads/images/";
         if (is_dir($imageDir)) {
@@ -42,7 +47,12 @@ include 'auth.php';
                 while (($file = readdir($dh)) !== false) {
                     if ($file != "." && $file != "..") {
                         echo "<div class='col-12 col-md-4 file-item'>
-                                <img src='$imageDir$file' alt='$file' data-bs-toggle='modal' data-bs-target='#fileModal' data-filepath='$imageDir$file'>
+                                <div class='card'>
+                                    <img src='$imageDir$file' class='card-img-top' alt='$file' data-bs-toggle='modal' data-bs-target='#fileModal' data-filepath='$imageDir$file'>
+                                    <div class='card-body'>
+                                        <p class='card-text'>$file</p>
+                                    </div>
+                                </div>
                               </div>";
                     }
                 }
@@ -53,7 +63,7 @@ include 'auth.php';
         </div>
         
         <h3>Vídeos</h3>
-        <div class="row">
+        <div class="row" id="videoGallery">
         <?php
         $videoDir = "uploads/videos/";
         if (is_dir($videoDir)) {
@@ -62,10 +72,15 @@ include 'auth.php';
                     if ($file != "." && $file != "..") {
                         $fileType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                         echo "<div class='col-12 col-md-6 file-item'>
-                                <video data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal' controls>
-                                    <source src='$videoDir$file' type='video/$fileType'>
-                                    Seu navegador não suporta a tag de vídeo.
-                                </video>
+                                <div class='card'>
+                                    <video class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal' controls>
+                                        <source src='$videoDir$file' type='video/$fileType'>
+                                        Seu navegador não suporta a tag de vídeo.
+                                    </video>
+                                    <div class='card-body'>
+                                        <p class='card-text'>$file</p>
+                                    </div>
+                                </div>
                               </div>";
                     }
                 }
@@ -76,7 +91,7 @@ include 'auth.php';
         </div>
         
         <h3>Outros Arquivos</h3>
-        <ul class="list-group">
+        <ul class="list-group" id="otherFiles">
         <?php
         $otherDir = "uploads/others/";
         if (is_dir($otherDir)) {
@@ -143,7 +158,7 @@ include 'auth.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-    <!-- Script para manipular os modais e botões -->
+    <!-- Script para manipular os modais, filtros e botões -->
     <script>
         var filePath = '';
         
@@ -162,7 +177,7 @@ include 'auth.php';
             } else {
                 modalBody.innerHTML = `<img src='${filePath}' alt='Arquivo' class='img-fluid'>`;
             }
-            
+
             downloadLink.href = filePath;
             deleteButton.onclick = function() { deleteFile(filePath); };
             shareButton.onclick = function() { shareFile(filePath); };
@@ -217,6 +232,39 @@ include 'auth.php';
                 reader.readAsDataURL(file);
             } else {
                 preview.innerHTML = '';
+            }
+        }
+
+        function filterFiles() {
+            var searchInput = document.getElementById('searchInput').value.toLowerCase();
+            var imageGallery = document.getElementById('imageGallery').getElementsByClassName('file-item');
+            var videoGallery = document.getElementById('videoGallery').getElementsByClassName('file-item');
+            var otherFiles = document.getElementById('otherFiles').getElementsByTagName('li');
+
+            filterGallery(imageGallery, searchInput);
+            filterGallery(videoGallery, searchInput);
+            filterOtherFiles(otherFiles, searchInput);
+        }
+
+        function filterGallery(gallery, searchInput) {
+            for (var i = 0; i < gallery.length; i++) {
+                var cardText = gallery[i].getElementsByClassName('card-text')[0].innerText.toLowerCase();
+                if (cardText.includes(searchInput)) {
+                    gallery[i].style.display = '';
+                } else {
+                    gallery[i].style.display = 'none';
+                }
+            }
+        }
+
+        function filterOtherFiles(files, searchInput) {
+            for (var i = 0; i < files.length; i++) {
+                var fileText = files[i].innerText.toLowerCase();
+                if (fileText.includes(searchInput)) {
+                    files[i].style.display = '';
+                } else {
+                    files[i].style.display = 'none';
+                }
             }
         }
     </script>
