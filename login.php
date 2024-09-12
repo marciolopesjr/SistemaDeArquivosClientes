@@ -2,8 +2,8 @@
 session_start();
 
 // Credenciais de login (troque por suas próprias credenciais)
-$validUsername = 'admin';
-$validPassword = 'senha123';
+$validUsername = 'clairtonsessim';
+$validPassword = '15111';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
