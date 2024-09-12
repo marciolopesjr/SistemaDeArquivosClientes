@@ -125,15 +125,10 @@ include 'auth.php';
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="fileInput" class="form-label">Escolha um arquivo:</label>
-                            <input type="file" class="form-control" name="file" id="fileInput" required>
+                            <input type="file" class="form-control" name="file" id="fileInput" required onchange="previewFile()">
                         </div>
-                        <div class="mb-3">
-                            <label for="fileName" class="form-label">Nome do Arquivo:</label>
-                            <input type="text" class="form-control" name="filename" id="fileName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="fileDescription" class="form-label">Descrição:</label>
-                            <textarea class="form-control" name="filedescription" id="fileDescription" rows="3" required></textarea>
+                        <div id="filePreview" class="text-center">
+                            <!-- Preview do arquivo será carregado dinamicamente -->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -197,6 +192,31 @@ include 'auth.php';
                 var shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
                 shareModal.show();
                 document.getElementById('shareLink').value = window.location.href.replace('index.php', '') + path;
+            }
+        }
+        
+        function previewFile() {
+            var file = document.getElementById('fileInput').files[0];
+            var preview = document.getElementById('filePreview');
+            
+            if (file) {
+                var reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    var fileType = file.type;
+                    
+                    if (fileType.startsWith('image/')) {
+                        preview.innerHTML = `<h5>${file.name}</h5><img src="${e.target.result}" alt="${file.name}" class="img-fluid">`;
+                    } else if (fileType.startsWith('video/')) {
+                        preview.innerHTML = `<h5>${file.name}</h5><video width="100%" controls><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
+                    } else {
+                        preview.innerHTML = `<h5>${file.name}</h5><p>Pré-visualização não disponível para este tipo de arquivo.</p>`;
+                    }
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
             }
         }
     </script>
