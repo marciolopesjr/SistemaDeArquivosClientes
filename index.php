@@ -76,10 +76,9 @@ include 'auth.php';
                         $fileType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                         echo "<div class='col-12 col-md-6 file-item'>
                                 <div class='card'>
-                                    <video class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal'>
-                                        <source src='$videoDir$file' type='video/$fileType'>
-                                        Seu navegador não suporta a tag de vídeo.
-                                    </video>
+                                    <div class='card-img-top' data-filepath='$videoDir$file' data-bs-toggle='modal' data-bs-target='#fileModal'>
+                                        <video controls><source src='$videoDir$file' type='video/$fileType'></video>
+                                    </div>
                                     <div class='card-body'>
                                         <p class='card-text'>$file</p>
                                     </div>
@@ -226,7 +225,7 @@ include 'auth.php';
                     if (fileType.startsWith('image/')) {
                         preview.innerHTML = `<h5>${file.name}</h5><img src="${e.target.result}" alt="${file.name}" class="img-fluid">`;
                     } else if (fileType.startsWith('video/')) {
-                        preview.innerHTML = `<h5>${file.name}</h5><video width="100%"><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
+                        preview.innerHTML = `<h5>${file.name}</h5><video width="100%" controls><source src="${e.target.result}" type="${fileType}">Seu navegador não suporta a tag de vídeo.</video>`;
                     } else {
                         preview.innerHTML = `<h5>${file.name}</h5><p>Pré-visualização não disponível para este tipo de arquivo.</p>`;
                     }
